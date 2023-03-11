@@ -3,7 +3,7 @@ using WebAPI.Model;
 
 namespace WebAPI.Services
 {
-
+    
     public interface IResultService
     {
         List<Author> GetAllAuthors();
@@ -11,11 +11,27 @@ namespace WebAPI.Services
         void AddAuthor(Author author);
         Author UpdateAuthor(int id, Author author);
         Author DeleteAuthor(int id);
+        void InitializeAuthors(int numberOfAuthors);
     }
 
     public class ResultService : IResultService
     {
         private AuthorsDatalayer _authorsDatalayer;
+
+        private static readonly string[] FirstNames = new[]
+        {
+            "Jim", "John", "Alex", "Teo", "George", "Takis"
+        };
+
+        private static readonly string[] LastNames = new[]
+        {
+            "Papadopoulos", "Papas", "Ioannidis", "Konstantinidis", "Aggelou", "Gonias"
+        };
+
+        private static readonly string[] Countries = new[]
+        {
+            "Greece", "Italy", "Germany", "Cyprus", "France", "Switzerland"
+        };
 
         public ResultService()
         {
@@ -83,6 +99,24 @@ namespace WebAPI.Services
             _authorsDatalayer.CloseConnection();
 
             return author;
+        }
+
+        public void InitializeAuthors(int numberOfAuthors)
+        {
+            _authorsDatalayer.OpenConnection();
+
+            for (int i = 1; i <= numberOfAuthors; i++)
+            {
+                Author author = new Author();
+
+                author.FirstName = FirstNames[new Random().Next(FirstNames.Length)];
+                author.LastName = LastNames[new Random().Next(LastNames.Length)];
+                author.Country = Countries[new Random().Next(Countries.Length)];
+
+                _authorsDatalayer.AddAuthor(author);
+            }
+
+            _authorsDatalayer.CloseConnection();
         }
     }
 }

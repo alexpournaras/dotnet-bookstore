@@ -21,6 +21,14 @@ namespace WebAPI.Controllers
             return _resultService.GetAllAuthors();
         }
 
+        [HttpGet("init/{numberOfAuthors}")]
+        public ActionResult<List<Author>> InitializeAuthors(int numberOfAuthors)
+        {
+            _resultService.InitializeAuthors(numberOfAuthors);
+            
+            return _resultService.GetAllAuthors();
+        }
+
         [HttpGet("{id}")]
         public ActionResult<Author> Get(int id)
         {
