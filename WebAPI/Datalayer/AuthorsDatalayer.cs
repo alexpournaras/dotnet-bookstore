@@ -58,5 +58,76 @@ namespace WebAPI.Datalayer
 
             return authors;
         }
+
+        public Author GetAuthorById(int id)
+        {
+
+            string query = "SELECT * FROM library.authors WHERE id = @Id";
+
+            using (var cmd = new NpgsqlCommand(query, _dbInstance))
+            {
+                cmd.Parameters.AddWithValue("@Id", id);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        Author author = new Author();
+                        
+                        author.Id = Convert.ToInt32(reader["id"]);
+                        author.FirstName = Convert.ToString(reader["first_name"]);
+                        author.LastName = Convert.ToString(reader["last_name"]);
+                        author.Country = Convert.ToString(reader["country"]);
+                        author.Books = Convert.ToInt32(reader["books"]);
+
+                        return author;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public void AddAuthor(Author author)
+        {
+            string query = "INSERT INTO library.authors (first_name, last_name, country, books) VALUES (@FirstName, @LastName, @Country, 0)";
+
+            using (var cmd = new NpgsqlCommand(query, _dbInstance))
+            {
+                cmd.Parameters.AddWithValue("@FirstName", author.FirstName);
+                cmd.Parameters.AddWithValue("@LastName", author.LastName);
+                cmd.Parameters.AddWithValue("@Country", author.Country);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void UpdateAuthor(Author existingAuthor, Author updatedAuthor)
+        {
+            string query = "UPDATE library.authors SET first_name = @FirstName, last_name = @LastName, country = @Country, books = @Books WHERE id = @Id";
+
+            using (var cmd = new NpgsqlCommand(query, _dbInstance))
+            {
+                cmd.Parameters.AddWithValue("@Id", existingAuthor.Id);
+                cmd.Parameters.AddWithValue("@FirstName", updatedAuthor.FirstName);
+                cmd.Parameters.AddWithValue("@LastName", updatedAuthor.LastName);
+                cmd.Parameters.AddWithValue("@Country", updatedAuthor.Country);
+                cmd.Parameters.AddWithValue("@Books", updatedAuthor.Books);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteAuthor(Author author)
+        {
+            string query = "DELETE FROM library.authors WHERE id = @Id";
+
+            using (var cmd = new NpgsqlCommand(query, _dbInstance))
+            {
+                cmd.Parameters.AddWithValue("@Id", author.Id);
+
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }
