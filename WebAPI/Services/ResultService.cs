@@ -7,16 +7,22 @@ namespace WebAPI.Services
     public interface IResultService
     {
         List<Author> GetAllAuthors();
+        List<Book> GetAllBooks();
         Author GetAuthorById(int id);
+        Book GetBookById(int id);
         void AddAuthor(Author author);
+        void AddBook(Book book);
         Author UpdateAuthor(int id, Author author);
+        Book UpdateBook(int id, Book book);
         Author DeleteAuthor(int id);
+        Book DeleteBook(int id);
         void InitializeAuthors(int numberOfAuthors);
     }
 
     public class ResultService : IResultService
     {
         private AuthorsDatalayer _authorsDatalayer;
+        private BooksDatalayer _booksDatalayer;
 
         private static readonly string[] FirstNames = new[]
         {
@@ -36,6 +42,7 @@ namespace WebAPI.Services
         public ResultService()
         {
             _authorsDatalayer = new AuthorsDatalayer();
+            _booksDatalayer = new BooksDatalayer();
         }
 
         public List<Author> GetAllAuthors()
@@ -49,6 +56,17 @@ namespace WebAPI.Services
             return authors;
         }
 
+        public List<Book> GetAllBooks()
+        {
+            _booksDatalayer.OpenConnection();
+
+            List<Book> books = _booksDatalayer.GetAllBooks();
+
+            _booksDatalayer.CloseConnection();
+
+            return books;
+        }
+
         public Author GetAuthorById(int id)
         {
             _authorsDatalayer.OpenConnection();
@@ -60,6 +78,17 @@ namespace WebAPI.Services
             return author;
         }
 
+        public Book GetBookById(int id)
+        {
+            _booksDatalayer.OpenConnection();
+
+            Book book = _booksDatalayer.GetBookById(id);
+
+            _booksDatalayer.CloseConnection();
+
+            return book;
+        }
+
         public void AddAuthor(Author author)
         {
             _authorsDatalayer.OpenConnection();
@@ -67,6 +96,15 @@ namespace WebAPI.Services
             _authorsDatalayer.AddAuthor(author);
 
             _authorsDatalayer.CloseConnection();
+        }
+
+        public void AddBook(Book book)
+        {
+            _booksDatalayer.OpenConnection();
+
+            _booksDatalayer.AddBook(book);
+
+            _booksDatalayer.CloseConnection();
         }
 
         public Author UpdateAuthor(int id, Author updatedAuthor)
@@ -85,6 +123,22 @@ namespace WebAPI.Services
             return existingAuthor;
         }
 
+        public Book UpdateBook(int id, Book updatedBook)
+        {
+            _booksDatalayer.OpenConnection();
+
+            Book existingBook = _booksDatalayer.GetBookById(id);
+
+            if (existingBook != null)
+            {
+                _booksDatalayer.UpdateBook(existingBook, updatedBook);
+            }
+
+            _booksDatalayer.CloseConnection();
+
+            return existingBook;
+        }
+
         public Author DeleteAuthor(int id)
         {
             _authorsDatalayer.OpenConnection();
@@ -99,6 +153,22 @@ namespace WebAPI.Services
             _authorsDatalayer.CloseConnection();
 
             return author;
+        }
+
+        public Book DeleteBook(int id)
+        {
+            _booksDatalayer.OpenConnection();
+
+            Book book = _booksDatalayer.GetBookById(id);
+
+            if (book != null)
+            {
+                _booksDatalayer.DeleteBook(book);
+            }
+
+            _booksDatalayer.CloseConnection();
+
+            return book;
         }
 
         public void InitializeAuthors(int numberOfAuthors)

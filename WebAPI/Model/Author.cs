@@ -8,17 +8,14 @@ namespace WebAPI.Model
         public int Id { get; set; }
 
         [Required(ErrorMessage = "The first_name field is required.")]
-
         [JsonPropertyName("first_name")]
         public string FirstName { get; set; }
 
         [Required(ErrorMessage = "The last_name field is required.")]
-
         [JsonPropertyName("last_name")]
         public string LastName { get; set; }
 
         [Required(ErrorMessage = "The country field is required.")]
-
         [JsonPropertyName("country")]
         public string Country { get; set; }
 
