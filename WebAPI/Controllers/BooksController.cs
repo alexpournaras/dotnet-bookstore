@@ -28,7 +28,7 @@ namespace WebAPI.Controllers
 
             if (authors.Count == 0)
             {
-                return NotFound($"You cannot initialize books without authors. First add some authors!");
+                return BadRequest($"You cannot initialize books without authors. First add some authors!");
             }
 
             _resultService.InitializeBooks(numberOfBooks, authors);

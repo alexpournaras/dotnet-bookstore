@@ -50,7 +50,6 @@ namespace WebAPI.Datalayer
                         author.FirstName = Convert.ToString(reader["first_name"]);
                         author.LastName = Convert.ToString(reader["last_name"]);
                         author.Country = Convert.ToString(reader["country"]);
-                        author.Books = Convert.ToInt32(reader["books"]);
 
                         Book book = new Book();
                         book.Id = Convert.ToInt32(reader["id"]);
@@ -71,7 +70,6 @@ namespace WebAPI.Datalayer
 
         public Book GetBookById(int id)
         {
-
             string query = "SELECT * FROM library.books INNER JOIN library.authors ON library.books.author_id = library.authors.id WHERE library.books.id = @Id";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
@@ -87,7 +85,6 @@ namespace WebAPI.Datalayer
                         author.FirstName = Convert.ToString(reader["first_name"]);
                         author.LastName = Convert.ToString(reader["last_name"]);
                         author.Country = Convert.ToString(reader["country"]);
-                        author.Books = Convert.ToInt32(reader["books"]);
 
                         Book book = new Book();
                         book.Id = Convert.ToInt32(reader["id"]);
@@ -104,6 +101,36 @@ namespace WebAPI.Datalayer
             }
 
             return null;
+        }
+
+        public List<Book> GetBooksByAuthor(int authorId)
+        {
+            List<Book> books = new List<Book>();
+
+            string query = "SELECT * FROM library.books WHERE author_id = @AuthorId";
+
+            using (var cmd = new NpgsqlCommand(query, _dbInstance))
+            {
+                cmd.Parameters.AddWithValue("@AuthorId", authorId);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        Book book = new Book();
+                        book.Id = Convert.ToInt32(reader["id"]);
+                        book.Date = Convert.ToString(reader["date"]);
+                        book.Title = Convert.ToString(reader["title"]);
+                        book.Category = Convert.ToString(reader["category"]);
+                        book.Pages = Convert.ToInt32(reader["pages"]);
+                        book.AuthorId = Convert.ToInt32(reader["author_id"]);
+
+                        books.Add(book);
+                    }
+                }
+            }
+
+            return books;
         }
 
         public void AddBook(Book book)

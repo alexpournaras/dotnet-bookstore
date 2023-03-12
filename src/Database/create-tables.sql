@@ -8,8 +8,7 @@ CREATE TABLE library.authors
     id SERIAL PRIMARY KEY,
     first_name character varying COLLATE pg_catalog."default" NOT NULL,
     last_name character varying COLLATE pg_catalog."default" NOT NULL,
-    country character varying COLLATE pg_catalog."default" NOT NULL,
-    books int NOT NULL
+    country character varying COLLATE pg_catalog."default" NOT NULL
 )
 WITH (
     OIDS = FALSE

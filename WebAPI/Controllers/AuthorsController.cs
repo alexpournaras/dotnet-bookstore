@@ -70,14 +70,19 @@ namespace WebAPI.Controllers
                 return NotFound($"Author with ID {id} was not found");
             }
 
-            return Ok($"Author {oldAuthor.FirstName} {oldAuthor.LastName} from {oldAuthor.Country} with {oldAuthor.Books} books, has been updated to {author.FirstName} {author.LastName} from {author.Country} with {author.Books} books.");
+            return Ok($"Author {oldAuthor.FirstName} {oldAuthor.LastName} from {oldAuthor.Country}, has been updated to {author.FirstName} {author.LastName} from {author.Country}.");
         }
 
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            Author author = _resultService.DeleteAuthor(id);
+            List<Book> books = _resultService.GetBooksByAuthor(id);
+            if (books.Count > 0)
+            {
+                return BadRequest($"You have to delete all books from this author first!");
+            }
 
+            Author author = _resultService.DeleteAuthor(id);
             if (author == null)
             {
                 return NotFound($"Author with ID {id} was not found");

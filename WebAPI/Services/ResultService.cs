@@ -10,6 +10,7 @@ namespace WebAPI.Services
         List<Book> GetAllBooks();
         Author GetAuthorById(int id);
         Book GetBookById(int id);
+        List<Book> GetBooksByAuthor(int authorId);
         void AddAuthor(Author author);
         void AddBook(Book book);
         Author UpdateAuthor(int id, Author author);
@@ -98,6 +99,17 @@ namespace WebAPI.Services
             _booksDatalayer.CloseConnection();
 
             return book;
+        }
+
+        public List<Book> GetBooksByAuthor(int authorId)
+        {
+            _booksDatalayer.OpenConnection();
+
+            List<Book> books = _booksDatalayer.GetBooksByAuthor(authorId);
+
+            _booksDatalayer.CloseConnection();
+
+            return books;
         }
 
         public void AddAuthor(Author author)

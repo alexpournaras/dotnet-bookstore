@@ -49,7 +49,7 @@ namespace WebAPI.Datalayer
                         author.FirstName = Convert.ToString(reader["first_name"]);
                         author.LastName = Convert.ToString(reader["last_name"]);
                         author.Country = Convert.ToString(reader["country"]);
-                        author.Books = Convert.ToInt32(reader["books"]);
+                        author.Books = new List<Book>();
 
                         authors.Add(author);
                     }
@@ -78,7 +78,6 @@ namespace WebAPI.Datalayer
                         author.FirstName = Convert.ToString(reader["first_name"]);
                         author.LastName = Convert.ToString(reader["last_name"]);
                         author.Country = Convert.ToString(reader["country"]);
-                        author.Books = Convert.ToInt32(reader["books"]);
 
                         return author;
                     }
@@ -90,7 +89,7 @@ namespace WebAPI.Datalayer
 
         public void AddAuthor(Author author)
         {
-            string query = "INSERT INTO library.authors (first_name, last_name, country, books) VALUES (@FirstName, @LastName, @Country, 0)";
+            string query = "INSERT INTO library.authors (first_name, last_name, country) VALUES (@FirstName, @LastName, @Country)";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
             {
@@ -104,7 +103,7 @@ namespace WebAPI.Datalayer
 
         public void UpdateAuthor(Author existingAuthor, Author updatedAuthor)
         {
-            string query = "UPDATE library.authors SET first_name = @FirstName, last_name = @LastName, country = @Country, books = @Books WHERE id = @Id";
+            string query = "UPDATE library.authors SET first_name = @FirstName, last_name = @LastName, country = @Country WHERE id = @Id";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
             {
@@ -112,7 +111,6 @@ namespace WebAPI.Datalayer
                 cmd.Parameters.AddWithValue("@FirstName", updatedAuthor.FirstName);
                 cmd.Parameters.AddWithValue("@LastName", updatedAuthor.LastName);
                 cmd.Parameters.AddWithValue("@Country", updatedAuthor.Country);
-                cmd.Parameters.AddWithValue("@Books", updatedAuthor.Books);
 
                 cmd.ExecuteNonQuery();
             }

@@ -19,8 +19,7 @@ namespace WebAPI.Model
         [JsonPropertyName("country")]
         public string Country { get; set; }
 
-        [JsonPropertyName("books")]
-        public int Books { get; set; }
+        public List<Book> Books { get; set; }
     }
 
 }
