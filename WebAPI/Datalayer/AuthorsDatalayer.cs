@@ -35,7 +35,7 @@ namespace WebAPI.Datalayer
         {
             List<Author> authors = new List<Author>();
 
-            string query = "SELECT * FROM library.authors ORDER BY id";
+            string query = "SELECT *, library.books.id as book_id FROM library.authors LEFT JOIN library.books ON library.authors.id = library.books.author_id ORDER BY library.authors.id";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
             {
@@ -43,15 +43,31 @@ namespace WebAPI.Datalayer
                 {
                     while (reader.Read())
                     {
-                        Author author = new Author();
-                        
-                        author.Id = Convert.ToInt32(reader["id"]);
-                        author.FirstName = Convert.ToString(reader["first_name"]);
-                        author.LastName = Convert.ToString(reader["last_name"]);
-                        author.Country = Convert.ToString(reader["country"]);
-                        author.Books = new List<Book>();
+                        Author author = authors.FirstOrDefault(author => author.Id == Convert.ToInt32(reader["id"]));
+                        if (author == null)
+                        {
+                            author = new Author();
+                            author.Id = Convert.ToInt32(reader["id"]);
+                            author.FirstName = Convert.ToString(reader["first_name"]);
+                            author.LastName = Convert.ToString(reader["last_name"]);
+                            author.Country = Convert.ToString(reader["country"]);
+                            author.Books = new List<Book>();
 
-                        authors.Add(author);
+                            authors.Add(author);
+                        }
+
+                        if (reader["book_id"] != DBNull.Value)
+                        {
+                            Book book = new Book();
+                            book.Id = Convert.ToInt32(reader["book_id"]);
+                            book.Date = Convert.ToString(reader["date"]);
+                            book.Title = Convert.ToString(reader["title"]);
+                            book.Category = Convert.ToString(reader["category"]);
+                            book.Pages = Convert.ToInt32(reader["pages"]);
+                            book.AuthorId = Convert.ToInt32(reader["author_id"]);
+
+                            author.Books.Add(book);
+                        }
                     }
                 }
             }
@@ -61,8 +77,9 @@ namespace WebAPI.Datalayer
 
         public Author GetAuthorById(int id)
         {
+            Author author = null;
 
-            string query = "SELECT * FROM library.authors WHERE id = @Id";
+            string query = "SELECT *, library.books.id as book_id FROM library.authors LEFT JOIN library.books ON library.authors.id = library.books.author_id WHERE library.authors.id = @Id";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
             {
@@ -70,21 +87,35 @@ namespace WebAPI.Datalayer
 
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        Author author = new Author();
-                        
-                        author.Id = Convert.ToInt32(reader["id"]);
-                        author.FirstName = Convert.ToString(reader["first_name"]);
-                        author.LastName = Convert.ToString(reader["last_name"]);
-                        author.Country = Convert.ToString(reader["country"]);
+                        if (author == null)
+                        {
+                            author = new Author();
+                            author.Id = Convert.ToInt32(reader["id"]);
+                            author.FirstName = Convert.ToString(reader["first_name"]);
+                            author.LastName = Convert.ToString(reader["last_name"]);
+                            author.Country = Convert.ToString(reader["country"]);
+                            author.Books = new List<Book>();
+                        }
 
-                        return author;
+                        if (reader["book_id"] != DBNull.Value)
+                        {
+                            Book book = new Book();
+                            book.Id = Convert.ToInt32(reader["book_id"]);
+                            book.Date = Convert.ToString(reader["date"]);
+                            book.Title = Convert.ToString(reader["title"]);
+                            book.Category = Convert.ToString(reader["category"]);
+                            book.Pages = Convert.ToInt32(reader["pages"]);
+                            book.AuthorId = Convert.ToInt32(reader["author_id"]);
+
+                            author.Books.Add(book);
+                        }
                     }
                 }
             }
 
-            return null;
+            return author;
         }
 
         public void AddAuthor(Author author)
