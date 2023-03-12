@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Model;
 using WebAPI.Services;
+using System.Linq;
 
 namespace WebAPI.Controllers
 {
@@ -34,6 +35,20 @@ namespace WebAPI.Controllers
             _resultService.InitializeBooks(numberOfBooks, authors);
 
             return _resultService.GetAllBooks();
+        }
+
+        [HttpGet("search")]
+        public ActionResult<List<Book>> SearchBooks(string searchTerm)
+        {
+            List<Book> books = _resultService.GetAllBooks();
+
+            return books.Where(book
+                => book.Title.Contains(searchTerm)
+                || book.Category.Contains(searchTerm)
+                || book.Author.FirstName.Contains(searchTerm)
+                || book.Author.LastName.Contains(searchTerm)
+                || book.Author.Country.Contains(searchTerm)
+            ).ToList();
         }
 
         [HttpGet("{id}")]
