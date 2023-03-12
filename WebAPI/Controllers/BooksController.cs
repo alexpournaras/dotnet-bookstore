@@ -21,6 +21,21 @@ namespace WebAPI.Controllers
             return _resultService.GetAllBooks();
         }
 
+        [HttpGet("init/{numberOfBooks}")]
+        public ActionResult<List<Book>> InitializeBooks(int numberOfBooks)
+        {
+            List<Author> authors = _resultService.GetAllAuthors();
+
+            if (authors.Count == 0)
+            {
+                return NotFound($"You cannot initialize books without authors. First add some authors!");
+            }
+
+            _resultService.InitializeBooks(numberOfBooks, authors);
+
+            return _resultService.GetAllBooks();
+        }
+
         [HttpGet("{id}")]
         public ActionResult<Book> Get(int id)
         {

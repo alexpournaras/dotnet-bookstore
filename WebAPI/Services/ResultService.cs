@@ -17,6 +17,7 @@ namespace WebAPI.Services
         Author DeleteAuthor(int id);
         Book DeleteBook(int id);
         void InitializeAuthors(int numberOfAuthors);
+        void InitializeBooks(int numberOfBooks, List<Author> authors);
     }
 
     public class ResultService : IResultService
@@ -37,6 +38,16 @@ namespace WebAPI.Services
         private static readonly string[] Countries = new[]
         {
             "Greece", "Italy", "Germany", "Cyprus", "France", "Switzerland"
+        };
+
+        private static readonly string[] Titles = new[]
+        {
+            "Harry Potter", "Lord of the Rings", "The Lion", "Pinocchio", "Alice in Wonderland"
+        };
+
+        private static readonly string[] Categories = new[]
+       {
+            "Adventure", "Crime", "Fantasy", "Historical", "Horror", "Humour"
         };
 
         public ResultService()
@@ -175,18 +186,46 @@ namespace WebAPI.Services
         {
             _authorsDatalayer.OpenConnection();
 
+            Random randomizer = new Random();
+
             for (int i = 1; i <= numberOfAuthors; i++)
             {
                 Author author = new Author();
 
-                author.FirstName = FirstNames[new Random().Next(FirstNames.Length)];
-                author.LastName = LastNames[new Random().Next(LastNames.Length)];
-                author.Country = Countries[new Random().Next(Countries.Length)];
+                author.FirstName = FirstNames[randomizer.Next(FirstNames.Length)];
+                author.LastName = LastNames[randomizer.Next(LastNames.Length)];
+                author.Country = Countries[randomizer.Next(Countries.Length)];
 
                 _authorsDatalayer.AddAuthor(author);
             }
 
             _authorsDatalayer.CloseConnection();
+        }
+
+        public void InitializeBooks(int numberOfBooks, List<Author> authors)
+        {
+            _booksDatalayer.OpenConnection();
+
+            Random randomizer = new Random();
+
+            for (int i = 1; i <= numberOfBooks; i++)
+            {
+                Book book = new Book();
+
+                DateTime startDate = DateTime.Now.AddDays(-365);
+                book.Date = startDate.AddDays(randomizer.Next(365)).ToString("yyyy-MM-dd");
+
+                Author author = authors[randomizer.Next(authors.Count)];
+                book.AuthorId = author.Id;
+
+                book.Title = Titles[randomizer.Next(Titles.Length)];
+                book.Category = Categories[randomizer.Next(Categories.Length)];
+                book.Pages = randomizer.Next(999);
+
+                _booksDatalayer.AddBook(book);
+            }
+
+            _booksDatalayer.CloseConnection();
         }
     }
 }
