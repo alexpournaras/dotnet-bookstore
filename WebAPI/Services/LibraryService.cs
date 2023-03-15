@@ -4,7 +4,7 @@ using WebAPI.Model;
 namespace WebAPI.Services
 {
     
-    public interface IResultService
+    public interface ILibraryService
     {
         List<Author> GetAllAuthors();
         List<Book> GetAllBooks();
@@ -21,7 +21,7 @@ namespace WebAPI.Services
         void InitializeBooks(int numberOfBooks, List<Author> authors);
     }
 
-    public class ResultService : IResultService
+    public class LibraryService : ILibraryService
     {
         private AuthorsDatalayer _authorsDatalayer;
         private BooksDatalayer _booksDatalayer;
@@ -51,7 +51,7 @@ namespace WebAPI.Services
             "Adventure", "Crime", "Fantasy", "Historical", "Horror", "Humour"
         };
 
-        public ResultService()
+        public LibraryService()
         {
             _authorsDatalayer = new AuthorsDatalayer();
             _booksDatalayer = new BooksDatalayer();

@@ -9,38 +9,38 @@ namespace WebAPI.Controllers
     [Route("[controller]")]
     public class BooksController : ControllerBase
     {
-        private IResultService _resultService;
+        private ILibraryService _libraryService;
 
-        public BooksController(IResultService resultService)
+        public BooksController(ILibraryService libraryService)
         {
-            _resultService = resultService;
+            _libraryService = libraryService;
         }
 
         [HttpGet]
         public ActionResult<List<Book>> GetAllBooks()
         {
-            return _resultService.GetAllBooks();
+            return _libraryService.GetAllBooks();
         }
 
         [HttpGet("init/{numberOfBooks}")]
         public ActionResult<List<Book>> InitializeBooks(int numberOfBooks)
         {
-            List<Author> authors = _resultService.GetAllAuthors();
+            List<Author> authors = _libraryService.GetAllAuthors();
 
             if (authors.Count == 0)
             {
                 return BadRequest($"You cannot initialize books without authors. First add some authors!");
             }
 
-            _resultService.InitializeBooks(numberOfBooks, authors);
+            _libraryService.InitializeBooks(numberOfBooks, authors);
 
-            return _resultService.GetAllBooks();
+            return _libraryService.GetAllBooks();
         }
 
         [HttpGet("search")]
         public ActionResult<List<Book>> SearchBooks(string searchTerm)
         {
-            List<Book> books = _resultService.GetAllBooks();
+            List<Book> books = _libraryService.GetAllBooks();
 
             return books.Where(book
                 => book.Title.Contains(searchTerm)
@@ -54,7 +54,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public ActionResult<Book> Get(int id)
         {
-            Book book = _resultService.GetBookById(id);
+            Book book = _libraryService.GetBookById(id);
 
             if (book == null)
             {
@@ -72,13 +72,13 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            Author author = _resultService.GetAuthorById((int)book.AuthorId);
+            Author author = _libraryService.GetAuthorById((int)book.AuthorId);
             if (author == null)
             {
                 return NotFound($"Author with ID {(int)book.AuthorId} was not found");
             }
 
-            _resultService.AddBook(book);
+            _libraryService.AddBook(book);
 
             return Ok($"Book {book.Title} of {author.FirstName} {author.LastName} has been added to the database.");
         }
@@ -91,13 +91,13 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            Author author = _resultService.GetAuthorById((int)book.AuthorId);
+            Author author = _libraryService.GetAuthorById((int)book.AuthorId);
             if (author == null)
             {
                 return NotFound($"Author with ID {(int)book.AuthorId} was not found");
             }
 
-            Book oldBook = _resultService.UpdateBook(id, book);
+            Book oldBook = _libraryService.UpdateBook(id, book);
             if (oldBook == null)
             {
                 return NotFound($"Book with ID {id} was not found");
@@ -109,7 +109,7 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            Book book = _resultService.DeleteBook(id);
+            Book book = _libraryService.DeleteBook(id);
 
             if (book == null)
             {

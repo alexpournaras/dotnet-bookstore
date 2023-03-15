@@ -8,31 +8,31 @@ namespace WebAPI.Controllers
     [Route("[controller]")]
     public class AuthorsController : ControllerBase
     {
-        private IResultService _resultService;
+        private ILibraryService _libraryService;
 
-        public AuthorsController(IResultService resultService)
+        public AuthorsController(ILibraryService libraryService)
         {
-            _resultService = resultService;
+            _libraryService = libraryService;
         }
 
         [HttpGet]
         public ActionResult<List<Author>> GetAllAuthors()
         {
-            return _resultService.GetAllAuthors();
+            return _libraryService.GetAllAuthors();
         }
 
         [HttpGet("init/{numberOfAuthors}")]
         public ActionResult<List<Author>> InitializeAuthors(int numberOfAuthors)
         {
-            _resultService.InitializeAuthors(numberOfAuthors);
+            _libraryService.InitializeAuthors(numberOfAuthors);
             
-            return _resultService.GetAllAuthors();
+            return _libraryService.GetAllAuthors();
         }
 
         [HttpGet("{id}")]
         public ActionResult<Author> Get(int id)
         {
-            Author author = _resultService.GetAuthorById(id);
+            Author author = _libraryService.GetAuthorById(id);
 
             if (author == null)
             {
@@ -50,7 +50,7 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            _resultService.AddAuthor(author);
+            _libraryService.AddAuthor(author);
 
             return Ok($"Author {author.FirstName} {author.LastName} has been added to the database.");
         }
@@ -63,7 +63,7 @@ namespace WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            Author oldAuthor = _resultService.UpdateAuthor(id, author);
+            Author oldAuthor = _libraryService.UpdateAuthor(id, author);
 
             if (oldAuthor == null)
             {
@@ -76,13 +76,13 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            List<Book> books = _resultService.GetBooksByAuthor(id);
+            List<Book> books = _libraryService.GetBooksByAuthor(id);
             if (books.Count > 0)
             {
                 return BadRequest($"You have to delete all books from this author first!");
             }
 
-            Author author = _resultService.DeleteAuthor(id);
+            Author author = _libraryService.DeleteAuthor(id);
             if (author == null)
             {
                 return NotFound($"Author with ID {id} was not found");
