@@ -17,6 +17,7 @@ namespace WebAPI
             services.AddControllers();
 
             services.AddScoped<ILibraryService, LibraryService>();
+            services.AddSingleton<IWorkerService, WorkerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
