@@ -261,6 +261,47 @@ namespace WebAPI.Datalayer
             return books;
         }
 
+        public List<Book> FindBooks(string searchTerm)
+        {
+            List<Book> books = new List<Book>();
+
+            string query = "SELECT * FROM library.books INNER JOIN library.authors ON library.books.author_id = library.authors.id "
+                + "WHERE library.books.title LIKE '%" + searchTerm + "%' "
+                + "OR library.books.category LIKE '%" + searchTerm + "%' "
+                + "OR library.authors.first_name LIKE '%" + searchTerm + "%' "
+                + "OR library.authors.last_name LIKE '%" + searchTerm + "%' "
+                + "OR library.authors.country LIKE '%" + searchTerm + "%' "
+                + "ORDER BY library.books.id";
+
+            using (var cmd = new NpgsqlCommand(query, _dbInstance))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Author author = new Author();
+                        author.Id = Convert.ToInt32(reader["author_id"]);
+                        author.FirstName = Convert.ToString(reader["first_name"]);
+                        author.LastName = Convert.ToString(reader["last_name"]);
+                        author.Country = Convert.ToString(reader["country"]);
+
+                        Book book = new Book();
+                        book.Id = Convert.ToInt32(reader["id"]);
+                        book.Date = Convert.ToString(reader["date"]);
+                        book.Title = Convert.ToString(reader["title"]);
+                        book.Category = Convert.ToString(reader["category"]);
+                        book.Pages = Convert.ToInt32(reader["pages"]);
+                        book.AuthorId = Convert.ToInt32(reader["author_id"]);
+                        book.Author = author;
+
+                        books.Add(book);
+                    }
+                }
+            }
+
+            return books;
+        }
+
         public void AddBook(Book book)
         {
             string query = "INSERT INTO library.books (date, author_id, title, category, pages) VALUES (@Date, @AuthorId, @Title, @Category, @Pages)";
