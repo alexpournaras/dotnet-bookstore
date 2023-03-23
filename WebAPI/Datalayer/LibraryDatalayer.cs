@@ -294,6 +294,32 @@ namespace WebAPI.Datalayer
             }
         }
 
+        public void InsertOrUpdateBook(Book book)
+        {
+            string query = "";
+
+            if (book.Id == 0) {
+                query = "INSERT INTO library.books (date, author_id, title, category, pages) VALUES (@Date, @AuthorId, @Title, @Category, @Pages)";
+            } else {
+                query = "UPDATE library.books SET date = @Date, author_id = @AuthorId, title = @Title, category = @Category, pages = @Pages WHERE id = @Id";
+            }
+
+            lock (_dbInstance)
+            {
+                using (var cmd = new NpgsqlCommand(query, _dbInstance))
+                {
+                    cmd.Parameters.AddWithValue("@Date", NpgsqlDbType.Date, DateTime.ParseExact(book.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture));
+                    cmd.Parameters.AddWithValue("@Id", book.Id);
+                    cmd.Parameters.AddWithValue("@AuthorId", book.AuthorId);
+                    cmd.Parameters.AddWithValue("@Title", book.Title);
+                    cmd.Parameters.AddWithValue("@Category", book.Category);
+                    cmd.Parameters.AddWithValue("@Pages", book.Pages);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         public void DeleteBook(Book book)
         {
             string query = "DELETE FROM library.books WHERE id = @Id";
