@@ -70,3 +70,37 @@ This endpoint creates a numerous books based on the numberOfBooks parameter.
 
 GET `/books/search?searchTerm={searchTerm}`  
 This endpoint searches all books to find relative title, category or author details
+
+# Parse
+POST `/parse`  
+This endpoint creates a job for bulk insert or update of books.
+If a book in JSON has an id property, it will update the book. If not, it will insert it into the database
+```
+[
+  {
+    "id" 4
+    "date": "2023-03-23",
+    "author_id": 10,
+    "title": "Harry Potter",
+    "category": "Adventure",
+    "pages": 694
+  },
+  {
+    "date": "2023-03-12",
+    "author_id": 10,
+    "title": "Lord Of The Rings",
+    "category": "Fantasy",
+    "pages": 469
+  }
+]
+```
+
+# Jobs
+GET `/jobs/:id`  
+This endpoint retrieves a job and prints the status of it.
+```
+Queued: The job is queued and it will be process when a worker is available.
+In-progress: The job is currently inserting or updating books.
+Failed: If a book failed to insert or update the whole job will be marked as failed.
+Completed: All books has been processed correctly. 
+```
