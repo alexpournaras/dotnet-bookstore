@@ -16,6 +16,7 @@ namespace WebAPI.Services
         Book UpdateBook(int id, Book book);
         Author DeleteAuthor(int id);
         Book DeleteBook(int id);
+        List<Book> FindBooks(string searchTerm);
         void InitializeAuthors(int numberOfAuthors);
         void InitializeBooks(int numberOfBooks, List<Author> authors);
     }
@@ -189,6 +190,17 @@ namespace WebAPI.Services
             _libraryDatalayer.CloseConnection();
 
             return book;
+        }
+
+        public List<Book> FindBooks(string searchTerm)
+        {
+            _libraryDatalayer.OpenConnection();
+
+            List<Book> books = _libraryDatalayer.FindBooks(searchTerm);
+
+            _libraryDatalayer.CloseConnection();
+
+            return books;
         }
 
         public void InitializeAuthors(int numberOfAuthors)

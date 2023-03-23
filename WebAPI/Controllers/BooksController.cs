@@ -40,15 +40,7 @@ namespace WebAPI.Controllers
         [HttpGet("search")]
         public ActionResult<List<Book>> SearchBooks(string searchTerm)
         {
-            List<Book> books = _libraryService.GetAllBooks();
-
-            return books.Where(book
-                => book.Title.Contains(searchTerm)
-                || book.Category.Contains(searchTerm)
-                || book.Author.FirstName.Contains(searchTerm)
-                || book.Author.LastName.Contains(searchTerm)
-                || book.Author.Country.Contains(searchTerm)
-            ).ToList();
+            return _libraryService.FindBooks(searchTerm);
         }
 
         [HttpGet("{id}")]
