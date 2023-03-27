@@ -13,13 +13,16 @@ namespace WebAPI.Helpers
 
         public void AddJobInQueue(Job job)
         {
+            // Add job in dictionary of queue
             _jobDictionary.TryAdd(job.Id, job);
 
+            // Parse books when a worker becomes available
             Task.Run(() => ParseJobBooks(job));
         }
 
         public Job FindJobById(Guid id)
         {
+            // Find the job in dictionary
             _jobDictionary.TryGetValue(id, out Job job);
 
             return job;
@@ -27,8 +30,10 @@ namespace WebAPI.Helpers
 
         public void ParseJobBooks(Job job)
         {
+            // Begin process of parsing. Set the in-progress status.
             job.Status = "In-progress";
 
+            // Create batches with books based on the _queueSize
             var batches = new List<List<Book>>();
 
             for (int i = 0; i < job.Books.Count; i += _queueSize)
@@ -38,6 +43,7 @@ namespace WebAPI.Helpers
 
             _libraryDatalayer.OpenConnection();
 
+            // Run the bulk insertion or update in parallel with configurable number of workers
             Parallel.ForEach(batches, new ParallelOptions { MaxDegreeOfParallelism = _numOfWorkers }, (batch) =>
             {
                 foreach (Book book in batch)
@@ -48,14 +54,17 @@ namespace WebAPI.Helpers
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex);
+                        // Set the job as failed even if only one book action failed.
                         job.Status = "Failed";
+
+                        Console.WriteLine(ex);
                     }
                 }
             });
 
             _libraryDatalayer.CloseConnection();
 
+            // Set status as completed if job succeed
             if (job.Status != "Failed") job.Status = "Completed";
         }
     }

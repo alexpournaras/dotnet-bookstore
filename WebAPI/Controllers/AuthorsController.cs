@@ -33,7 +33,6 @@ namespace WebAPI.Controllers
         public ActionResult<Author> Get(int id)
         {
             Author author = _libraryService.GetAuthorById(id);
-
             if (author == null)
             {
                 return NotFound($"Author with ID {id} was not found");
@@ -64,7 +63,6 @@ namespace WebAPI.Controllers
             }
 
             Author oldAuthor = _libraryService.UpdateAuthor(id, author);
-
             if (oldAuthor == null)
             {
                 return NotFound($"Author with ID {id} was not found");

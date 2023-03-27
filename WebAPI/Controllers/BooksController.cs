@@ -26,7 +26,6 @@ namespace WebAPI.Controllers
         public ActionResult<List<Book>> InitializeBooks(int numberOfBooks)
         {
             List<Author> authors = _libraryService.GetAllAuthors();
-
             if (authors.Count == 0)
             {
                 return BadRequest($"You cannot initialize books without authors. First add some authors!");
@@ -47,7 +46,6 @@ namespace WebAPI.Controllers
         public ActionResult<Book> Get(int id)
         {
             Book book = _libraryService.GetBookById(id);
-
             if (book == null)
             {
                 return NotFound($"Book with ID {id} was not found");
@@ -102,7 +100,6 @@ namespace WebAPI.Controllers
         public ActionResult Delete(int id)
         {
             Book book = _libraryService.DeleteBook(id);
-
             if (book == null)
             {
                 return NotFound($"Book with ID {id} was not found");
