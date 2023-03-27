@@ -11,10 +11,12 @@ namespace WebAPI.Services
 
     public class WorkerService : IWorkerService
     {
+        // The queue that contains the jobs
         ParsingQueue _queue = new ParsingQueue();
 
         public Job AddBooksInQueue(List<Book> books)
         {
+            // Create a new job
             Job job = new()
             {
                 Id = Guid.NewGuid(),
@@ -22,6 +24,7 @@ namespace WebAPI.Services
                 Books = books
             };
 
+            // Add job in queue
             _queue.AddJobInQueue(job);
 
             return job;
@@ -29,6 +32,7 @@ namespace WebAPI.Services
 
         public Job FindJobById(Guid id)
         {
+            // Find job to show status
             return _queue.FindJobById(id);
         }
     }

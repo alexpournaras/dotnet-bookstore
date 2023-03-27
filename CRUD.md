@@ -78,16 +78,16 @@ If a book in JSON has an id property, it will update the book. If not, it will i
 ```
 [
   {
-    "id" 4
+    "id": 4,
     "date": "2023-03-23",
-    "author_id": 10,
+    "author_id": 1,
     "title": "Harry Potter",
     "category": "Adventure",
     "pages": 694
   },
   {
     "date": "2023-03-12",
-    "author_id": 10,
+    "author_id": 1,
     "title": "Lord Of The Rings",
     "category": "Fantasy",
     "pages": 469
