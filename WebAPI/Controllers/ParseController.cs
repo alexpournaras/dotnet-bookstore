@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Model;
+using WebAPI.Filters;
 using WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -17,6 +18,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [IPLocationLookup]
         [Authorize(Roles = "Developer")]
         public ActionResult Post([FromBody] List<Book> books)
         {
