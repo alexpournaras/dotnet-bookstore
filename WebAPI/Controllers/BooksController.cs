@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Model;
 using WebAPI.Services;
-using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
@@ -17,12 +17,14 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Developer,User")]
         public ActionResult<List<Book>> GetAllBooks()
         {
             return _libraryService.GetAllBooks();
         }
 
         [HttpGet("init/{numberOfBooks}")]
+        [Authorize(Roles = "Developer")]
         public ActionResult<List<Book>> InitializeBooks(int numberOfBooks)
         {
             List<Author> authors = _libraryService.GetAllAuthors();
@@ -37,6 +39,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("search")]
+        [Authorize(Roles = "Developer,User")]
         public ActionResult<List<Book>> SearchBooks(string searchTerm)
         {
             return _libraryService.FindBooks(searchTerm);
@@ -55,6 +58,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Developer")]
         public ActionResult Post([FromBody] Book book)
         {
             if (!ModelState.IsValid)
@@ -74,6 +78,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Developer")]
         public ActionResult Put(int id, [FromBody] Book book)
         {
             if (!ModelState.IsValid)
@@ -97,6 +102,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Developer")]
         public ActionResult Delete(int id)
         {
             Book book = _libraryService.DeleteBook(id);
