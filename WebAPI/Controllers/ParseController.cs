@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Model;
 using WebAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
@@ -16,6 +17,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Developer")]
         public ActionResult Post([FromBody] List<Book> books)
         {
             Job job = _workerService.AddBooksInQueue(books);
