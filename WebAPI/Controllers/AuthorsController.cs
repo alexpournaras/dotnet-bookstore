@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Model;
+using WebAPI.Filters;
 using WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -24,6 +25,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("init/{numberOfAuthors}")]
+        [IPLocationLookup]
         [Authorize(Roles = "Developer")]
         public ActionResult<List<Author>> InitializeAuthors(int numberOfAuthors)
         {
@@ -45,6 +47,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [IPLocationLookup]
         [Authorize(Roles = "Developer")]
         public ActionResult Post([FromBody] Author author)
         {
@@ -77,6 +80,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [IPLocationLookup]
         [Authorize(Roles = "Developer")]
         public ActionResult Delete(int id)
         {
