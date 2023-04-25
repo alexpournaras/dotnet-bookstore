@@ -2,6 +2,7 @@ using WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using AspNetCoreRateLimit;
 
 namespace WebAPI
 {
@@ -17,6 +18,7 @@ namespace WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // JWT configuration
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -77,6 +79,25 @@ namespace WebAPI
                     }
                 });
             });
+
+            // Throttling configuration
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(options =>
+            {
+                options.GeneralRules = new List<RateLimitRule>
+                {
+                    new RateLimitRule
+                    {
+                        Endpoint = "*",
+                        Limit = 20,
+                        Period = "2s"
+                    }
+                };
+            });
+            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,6 +112,8 @@ namespace WebAPI
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseIpRateLimiting();
 
             app.UseEndpoints(endpoints =>
             {
