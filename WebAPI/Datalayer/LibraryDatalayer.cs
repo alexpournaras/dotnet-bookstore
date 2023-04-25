@@ -120,7 +120,7 @@ namespace WebAPI.Datalayer
             return author;
         }
 
-        public void AddAuthor(Author author)
+        public int AddAuthor(Author author)
         {
             string query = "INSERT INTO library.authors (first_name, last_name, country) VALUES (@FirstName, @LastName, @Country)";
 
@@ -130,17 +130,18 @@ namespace WebAPI.Datalayer
                 cmd.Parameters.AddWithValue("@LastName", author.LastName);
                 cmd.Parameters.AddWithValue("@Country", author.Country);
 
-                cmd.ExecuteNonQuery();
+                var id = (int)cmd.ExecuteScalar();
+                return id;
             }
         }
 
-        public void UpdateAuthor(Author existingAuthor, Author updatedAuthor)
+        public void UpdateAuthor(Author updatedAuthor)
         {
             string query = "UPDATE library.authors SET first_name = @FirstName, last_name = @LastName, country = @Country WHERE id = @Id";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
             {
-                cmd.Parameters.AddWithValue("@Id", existingAuthor.Id);
+                cmd.Parameters.AddWithValue("@Id", updatedAuthor.Id);
                 cmd.Parameters.AddWithValue("@FirstName", updatedAuthor.FirstName);
                 cmd.Parameters.AddWithValue("@LastName", updatedAuthor.LastName);
                 cmd.Parameters.AddWithValue("@Country", updatedAuthor.Country);
@@ -302,9 +303,9 @@ namespace WebAPI.Datalayer
             return books;
         }
 
-        public void AddBook(Book book)
+        public int AddBook(Book book)
         {
-            string query = "INSERT INTO library.books (date, author_id, title, category, pages) VALUES (@Date, @AuthorId, @Title, @Category, @Pages)";
+            string query = "INSERT INTO library.books (date, author_id, title, category, pages) VALUES (@Date, @AuthorId, @Title, @Category, @Pages) RETURNING id";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
             {
@@ -314,18 +315,19 @@ namespace WebAPI.Datalayer
                 cmd.Parameters.AddWithValue("@Category", book.Category);
                 cmd.Parameters.AddWithValue("@Pages", book.Pages);
 
-                cmd.ExecuteNonQuery();
+                var id = (int)cmd.ExecuteScalar();
+                return id;
             }
         }
 
-        public void UpdateBook(Book existingBook, Book updatedBook)
+        public void UpdateBook(Book updatedBook)
         {
             string query = "UPDATE library.books SET date = @Date, author_id = @AuthorId, title = @Title, category = @Category, pages = @Pages WHERE id = @Id";
 
             using (var cmd = new NpgsqlCommand(query, _dbInstance))
             {
                 cmd.Parameters.AddWithValue("@Date", NpgsqlDbType.Date, DateTime.ParseExact(updatedBook.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture));
-                cmd.Parameters.AddWithValue("@Id", existingBook.Id);
+                cmd.Parameters.AddWithValue("@Id", updatedBook.Id);
                 cmd.Parameters.AddWithValue("@AuthorId", updatedBook.AuthorId);
                 cmd.Parameters.AddWithValue("@Title", updatedBook.Title);
                 cmd.Parameters.AddWithValue("@Category", updatedBook.Category);

@@ -5,6 +5,7 @@ namespace WebAPI.Model
 {
     public class Book
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "The date field is required.")]
@@ -27,6 +28,7 @@ namespace WebAPI.Model
         [JsonPropertyName("author_id")]
         public int? AuthorId { get; set; }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Author Author { get; set; }
     }
 

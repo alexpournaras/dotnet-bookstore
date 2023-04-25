@@ -1,5 +1,7 @@
 ﻿using WebAPI.Datalayer;
+using WebAPI.Caching;
 using WebAPI.Model;
+using System.Text.Json;
 
 namespace WebAPI.Services
 {
@@ -23,8 +25,6 @@ namespace WebAPI.Services
 
     public class LibraryService : ILibraryService
     {
-        private LibraryDatalayer _libraryDatalayer;
-
         private static readonly string[] FirstNames = new[]
         {
             "Jim", "John", "Alex", "Teo", "George", "Takis"
@@ -46,55 +46,125 @@ namespace WebAPI.Services
         };
 
         private static readonly string[] Categories = new[]
-       {
+        {
             "Adventure", "Crime", "Fantasy", "Historical", "Horror", "Humour"
         };
 
-        public LibraryService()
+        private LibraryDatalayer _libraryDatalayer;
+        private RedisCacheManager _redisCacheManager;
+
+        public LibraryService(LibraryDatalayer libraryDatalayer, RedisCacheManager cacheManager)
         {
-            _libraryDatalayer = new LibraryDatalayer();
+            _libraryDatalayer = libraryDatalayer;
+            _redisCacheManager = cacheManager;
         }
 
         public List<Author> GetAllAuthors()
         {
-            _libraryDatalayer.OpenConnection();
+            List<Author> authors = new List<Author>();
+            var redisKeys = _redisCacheManager.Connection.GetServer(_redisCacheManager.Connection.GetEndPoints().First()).Keys(pattern: "author:*");
 
-            List<Author> authors = _libraryDatalayer.GetAllAuthors();
+            foreach (var redisKey in redisKeys)
+            {
+                string serializedAuthor = _redisCacheManager.Get<string>(redisKey);
 
-            _libraryDatalayer.CloseConnection();
+                if (!string.IsNullOrEmpty(serializedAuthor))
+                {
+                    Author author = JsonSerializer.Deserialize<Author>(serializedAuthor);
+                    authors.Add(author);
+                }
+            }
+
+            if (authors.Count == 0)
+            {
+                _libraryDatalayer.OpenConnection();
+                authors = _libraryDatalayer.GetAllAuthors();
+                _libraryDatalayer.CloseConnection();
+
+                foreach (Author author in authors)
+                {
+                    _redisCacheManager.Set($"author:{author.Id}", author);
+                }
+            }
 
             return authors;
         }
 
         public List<Book> GetAllBooks()
         {
-            _libraryDatalayer.OpenConnection();
+            List<Book> books = new List<Book>();
+            var redisKeys = _redisCacheManager.Connection.GetServer(_redisCacheManager.Connection.GetEndPoints().First()).Keys(pattern: "book:*");
 
-            List<Book> books = _libraryDatalayer.GetAllBooks();
+            foreach (var redisKey in redisKeys)
+            {
+                string serializedBook = _redisCacheManager.Get<string>(redisKey);
 
-            _libraryDatalayer.CloseConnection();
+                if (!string.IsNullOrEmpty(serializedBook))
+                {
+                    Book book = JsonSerializer.Deserialize<Book>(serializedBook);
+                    books.Add(book);
+                }
+            }
+
+            if (books.Count == 0)
+            {
+                _libraryDatalayer.OpenConnection();
+                books = _libraryDatalayer.GetAllBooks();
+                _libraryDatalayer.CloseConnection();
+
+                foreach (Book book in books)
+                {
+                    _redisCacheManager.Set($"book:{book.Id}", book);
+                }
+            }
 
             return books;
         }
 
         public Author GetAuthorById(int id)
         {
-            _libraryDatalayer.OpenConnection();
+            Author author = null;
+            string serializedAuthor = _redisCacheManager.Get<string>($"author:{id}");
 
-            Author author = _libraryDatalayer.GetAuthorById(id);
+            if (!string.IsNullOrEmpty(serializedAuthor))
+            {
+                author = JsonSerializer.Deserialize<Author>(serializedAuthor);
+            }
+            else
+            {
+                _libraryDatalayer.OpenConnection();
+                author = _libraryDatalayer.GetAuthorById(id);
+                _libraryDatalayer.CloseConnection();
 
-            _libraryDatalayer.CloseConnection();
+                if (author != null)
+                {
+                    _redisCacheManager.Set($"author:{id}", author);
+                }
+            }
 
             return author;
         }
 
         public Book GetBookById(int id)
         {
-            _libraryDatalayer.OpenConnection();
+            Book book = null;
+            string serializedBook = _redisCacheManager.Get<string>($"book:{id}");
 
-            Book book = _libraryDatalayer.GetBookById(id);
+            if (!string.IsNullOrEmpty(serializedBook))
+            {
+                book = JsonSerializer.Deserialize<Book>(serializedBook);
+            }
+            else
+            {
+                _libraryDatalayer.OpenConnection();
+                book = _libraryDatalayer.GetBookById(id);
+                _libraryDatalayer.CloseConnection();
 
-            _libraryDatalayer.CloseConnection();
+                if (book != null)
+                {
+                    _redisCacheManager.Set($"book:{id}", book);
+                }
+            }
 
             return book;
         }
@@ -114,29 +184,37 @@ namespace WebAPI.Services
         {
             _libraryDatalayer.OpenConnection();
 
-            _libraryDatalayer.AddAuthor(author);
+            int authorId = _libraryDatalayer.AddAuthor(author);
+            author.Id = authorId;
 
             _libraryDatalayer.CloseConnection();
+
+            _redisCacheManager.Set($"author:{author.Id}", author);
         }
 
         public void AddBook(Book book)
         {
             _libraryDatalayer.OpenConnection();
 
-            _libraryDatalayer.AddBook(book);
+            int bookId = _libraryDatalayer.AddBook(book);
+            book.Id = bookId;
 
             _libraryDatalayer.CloseConnection();
+
+            _redisCacheManager.Set($"book:{book.Id}", book);
         }
 
         public Author UpdateAuthor(int id, Author updatedAuthor)
         {
+            updatedAuthor.Id = id;
             _libraryDatalayer.OpenConnection();
 
             Author existingAuthor = _libraryDatalayer.GetAuthorById(id);
 
             if (existingAuthor != null)
             {
-                _libraryDatalayer.UpdateAuthor(existingAuthor, updatedAuthor);
+                _libraryDatalayer.UpdateAuthor(updatedAuthor);
+                _redisCacheManager.Set($"author:{id}", updatedAuthor);
             }
 
             _libraryDatalayer.CloseConnection();
@@ -146,13 +224,15 @@ namespace WebAPI.Services
 
         public Book UpdateBook(int id, Book updatedBook)
         {
+            updatedBook.Id = id;
             _libraryDatalayer.OpenConnection();
 
             Book existingBook = _libraryDatalayer.GetBookById(id);
 
             if (existingBook != null)
             {
-                _libraryDatalayer.UpdateBook(existingBook, updatedBook);
+                _libraryDatalayer.UpdateBook(updatedBook);
+                _redisCacheManager.Set($"book:{id}", updatedBook);
             }
 
             _libraryDatalayer.CloseConnection();
@@ -169,6 +249,7 @@ namespace WebAPI.Services
             if (author != null)
             {
                 _libraryDatalayer.DeleteAuthor(author);
+                _redisCacheManager.Remove($"author:{id}");
             }
 
             _libraryDatalayer.CloseConnection();
@@ -185,6 +266,7 @@ namespace WebAPI.Services
             if (book != null)
             {
                 _libraryDatalayer.DeleteBook(book);
+                _redisCacheManager.Remove($"book:{id}");
             }
 
             _libraryDatalayer.CloseConnection();
@@ -194,11 +276,16 @@ namespace WebAPI.Services
 
         public List<Book> FindBooks(string searchTerm)
         {
-            _libraryDatalayer.OpenConnection();
+            List<Book> books = _redisCacheManager.Get<List<Book>>($"search:{searchTerm}");
 
-            List<Book> books = _libraryDatalayer.FindBooks(searchTerm);
+            if (books == null)
+            {
+                _libraryDatalayer.OpenConnection();
+                books = _libraryDatalayer.FindBooks(searchTerm);
+                _libraryDatalayer.CloseConnection();
 
-            _libraryDatalayer.CloseConnection();
+                _redisCacheManager.Set($"search:{searchTerm}", books, TimeSpan.FromMinutes(30));
+            }
 
             return books;
         }
@@ -217,7 +304,10 @@ namespace WebAPI.Services
                 author.LastName = LastNames[randomizer.Next(LastNames.Length)];
                 author.Country = Countries[randomizer.Next(Countries.Length)];
 
-                _libraryDatalayer.AddAuthor(author);
+                int authorId = _libraryDatalayer.AddAuthor(author);
+                author.Id = authorId;
+
+                _redisCacheManager.Set($"author:{authorId}", author);
             }
 
             _libraryDatalayer.CloseConnection();
@@ -243,7 +333,10 @@ namespace WebAPI.Services
                 book.Category = Categories[randomizer.Next(Categories.Length)];
                 book.Pages = randomizer.Next(999);
 
-                _libraryDatalayer.AddBook(book);
+                int bookId = _libraryDatalayer.AddBook(book);
+                book.Id = bookId;
+
+                _redisCacheManager.Set($"book:{bookId}", book);
             }
 
             _libraryDatalayer.CloseConnection();

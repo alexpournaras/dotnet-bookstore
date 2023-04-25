@@ -1,4 +1,6 @@
+using WebAPI.Caching;
 using WebAPI.Services;
+using WebAPI.Datalayer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -47,6 +49,8 @@ namespace WebAPI
 
             services.AddControllers();
 
+            services.AddSingleton(new RedisCacheManager(Configuration.GetConnectionString("Redis")));
+            services.AddScoped<LibraryDatalayer>();
             services.AddScoped<ILibraryService, LibraryService>();
             services.AddSingleton<IWorkerService, WorkerService>();
 
