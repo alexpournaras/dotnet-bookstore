@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebAPI.Model;
+using WebAPI.Filters;
 using WebAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI.Controllers
 {
@@ -16,12 +18,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Developer,User")]
         public ActionResult<List<Author>> GetAllAuthors()
         {
             return _libraryService.GetAllAuthors();
         }
 
         [HttpGet("init/{numberOfAuthors}")]
+        [IPLocationLookup]
+        [Authorize(Roles = "Developer")]
         public ActionResult<List<Author>> InitializeAuthors(int numberOfAuthors)
         {
             _libraryService.InitializeAuthors(numberOfAuthors);
@@ -42,6 +47,8 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
+        [IPLocationLookup]
+        [Authorize(Roles = "Developer")]
         public ActionResult Post([FromBody] Author author)
         {
             if (!ModelState.IsValid)
@@ -55,6 +62,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Developer")]
         public ActionResult Put(int id, [FromBody] Author author)
         {
             if (!ModelState.IsValid)
@@ -72,6 +80,8 @@ namespace WebAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [IPLocationLookup]
+        [Authorize(Roles = "Developer")]
         public ActionResult Delete(int id)
         {
             List<Book> books = _libraryService.GetBooksByAuthor(id);
