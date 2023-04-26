@@ -5,6 +5,7 @@ namespace WebAPI.Model
 {
     public class Author
     {
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "The first_name field is required.")]
@@ -19,6 +20,7 @@ namespace WebAPI.Model
         [JsonPropertyName("country")]
         public string Country { get; set; }
 
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<Book> Books { get; set; }
     }
 
