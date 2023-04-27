@@ -78,7 +78,7 @@ namespace BookstoreAPI.Controllers
                     return NotFound(new { message = "Author not found!" });
                 }
 
-                return Ok("{ rows_affected: " + res + " }");
+                return Ok(new { rows_affected = res });
             }
             catch (Exception ex)
             {
@@ -97,8 +97,12 @@ namespace BookstoreAPI.Controllers
                 {
                     return NotFound(new { message = "Author not found!" });
                 }
+                else if (res == -1)
+                {
+                    return BadRequest(new { message = "Cannot delete author. There are some books associated with the author in the database." });
+                }
 
-                return Ok("{ rows_affected: " + res + " }");
+                return Ok(new { rows_affected = res });
             }
             catch (Exception ex)
             {

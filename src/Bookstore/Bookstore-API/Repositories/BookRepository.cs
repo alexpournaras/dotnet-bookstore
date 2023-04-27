@@ -121,14 +121,23 @@ namespace BookstoreAPI.Repositories
                 INSERT INTO library.books(title, date, category, pages, author_id) 
                 VALUES (@title, @date, @category, @pages, @author_id) RETURNING id";
 
-            using (var cmd = new NpgsqlCommand(query, GetConnection()))
+            try
             {
-                cmd.Parameters.AddWithValue("title", book.Title);
-                cmd.Parameters.AddWithValue("date", book.Date);
-                cmd.Parameters.AddWithValue("category", book.Category);
-                cmd.Parameters.AddWithValue("pages", book.Pages);
-                cmd.Parameters.AddWithValue("author_id", book.AuthorId);
-                book.Id = (int)cmd.ExecuteScalar();
+                using (var cmd = new NpgsqlCommand(query, GetConnection()))
+                {
+                    cmd.Parameters.AddWithValue("title", book.Title);
+                    cmd.Parameters.AddWithValue("date", book.Date);
+                    cmd.Parameters.AddWithValue("category", book.Category);
+                    cmd.Parameters.AddWithValue("pages", book.Pages);
+                    cmd.Parameters.AddWithValue("author_id", book.AuthorId);
+                    book.Id = (int)cmd.ExecuteScalar();
+                }
+            }
+            catch (PostgresException ex) when (ex.SqlState == "23503")
+            {
+                // insert or update on table "books" violates foreign key constraint "fk_author_id"
+                // Foreign key constraint violation
+                book = null;
             }
 
             CloseConnection();
@@ -173,12 +182,21 @@ namespace BookstoreAPI.Repositories
 
             query.Append($" WHERE id = @id");
             paramList.Add(new NpgsqlParameter("id", book.Id));
-
             int res;
-            using (var cmd = new NpgsqlCommand(query.ToString(), GetConnection()))
+
+            try
             {
-                cmd.Parameters.AddRange(paramList.ToArray());
-                res = cmd.ExecuteNonQuery();
+                using (var cmd = new NpgsqlCommand(query.ToString(), GetConnection()))
+                {
+                    cmd.Parameters.AddRange(paramList.ToArray());
+                    res = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (PostgresException ex) when (ex.SqlState == "23503")
+            {
+                // insert or update on table "books" violates foreign key constraint "fk_author_id"
+                // Foreign key constraint violation
+                res = -1;
             }
 
             CloseConnection();

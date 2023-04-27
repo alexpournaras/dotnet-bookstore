@@ -182,14 +182,22 @@ namespace BookstoreAPI.Repositories
         public int DeleteAuthor(int id)
         {
             OpenConnection();
-
             const string query = "DELETE FROM library.authors WHERE id = @id";
-
             int res;
-            using (var cmd = new NpgsqlCommand(query, GetConnection()))
+
+            try
             {
-                cmd.Parameters.AddWithValue("id", id);
-                res = cmd.ExecuteNonQuery();
+                using (var cmd = new NpgsqlCommand(query, GetConnection()))
+                {
+                    cmd.Parameters.AddWithValue("id", id);
+                    res = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (PostgresException ex) when (ex.SqlState == "23503")
+            {
+                // update or delete on table "authors" violates foreign key constraint "fk_author_id" on table "books"
+                // Foreign key constraint violation
+                res = -1;
             }
 
             CloseConnection();

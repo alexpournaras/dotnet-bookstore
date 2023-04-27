@@ -58,7 +58,12 @@ namespace BookstoreAPI.Controllers
         {
             try
             {
-                _bookService.Add(book);
+                var res = _bookService.Add(book);
+                if (res == null)
+                {
+                    return BadRequest(new { message = "Cannot insert book. Author not found!" });
+                }
+
                 return Ok(book);
             }
             catch (Exception ex)
@@ -78,8 +83,12 @@ namespace BookstoreAPI.Controllers
                 {
                     return NotFound(new { message = "Book not found!" });
                 }
+                else if (res == -1)
+                {
+                    return BadRequest(new { message = "Cannot update book. Author not found!" });
+                }
 
-                return Ok("{ rows_affected: " + res + " }");
+                return Ok(new { rows_affected = res });
             }
             catch (Exception ex)
             {
@@ -99,7 +108,7 @@ namespace BookstoreAPI.Controllers
                     return NotFound(new { message = "Book not found!" });
                 }
 
-                return Ok("{ rows_affected: " + res + " }");
+                return Ok(new { rows_affected = res });
             }
             catch (Exception ex)
             {
