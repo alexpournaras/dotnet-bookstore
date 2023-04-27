@@ -39,6 +39,11 @@ namespace BookstoreAPI.Controllers
             try
             {
                 var book = _bookService.Get(id);
+                if (book == null)
+                {
+                    return NotFound(new { message = "Book not found!" });
+                }
+
                 return Ok(book);
             }
             catch (Exception ex)
@@ -69,6 +74,11 @@ namespace BookstoreAPI.Controllers
             try
             {
                 var res = _bookService.Update(book);
+                if (res == 0)
+                {
+                    return NotFound(new { message = "Book not found!" });
+                }
+
                 return Ok("{ rows_affected: " + res + " }");
             }
             catch (Exception ex)
@@ -84,6 +94,11 @@ namespace BookstoreAPI.Controllers
             try
             {
                 var res = _bookService.Delete(id);
+                if (res == 0)
+                {
+                    return NotFound(new { message = "Book not found!" });
+                }
+
                 return Ok("{ rows_affected: " + res + " }");
             }
             catch (Exception ex)

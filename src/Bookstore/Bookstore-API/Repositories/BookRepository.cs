@@ -90,7 +90,7 @@ namespace BookstoreAPI.Repositories
         {
             OpenConnection();
             const string query = "SELECT * FROM library.books WHERE id = @id";
-            Book book;
+            Book book = null;
 
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
             {

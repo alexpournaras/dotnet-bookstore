@@ -53,7 +53,11 @@ namespace BookstoreAPI.Repositories
             OpenConnection();
 
             List<Author> authors = new List<Author>();
-            const string query = "SELECT * FROM library.authors";
+            const string query = @"
+                SELECT author.*, COUNT(book.id) as books_count FROM library.authors author
+                LEFT JOIN library.books book ON author.id = book.author_id
+                GROUP BY author.id
+                ORDER BY author.id";
 
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
             {
@@ -67,6 +71,7 @@ namespace BookstoreAPI.Repositories
                             FirstName = Convert.ToString(reader["first_name"]),
                             LastName = Convert.ToString(reader["last_name"]),
                             Country = Convert.ToString(reader["country"]),
+                            NumberOfBooks = Convert.ToInt32(reader["books_count"]),
                         };
 
                         authors.Add(author);
@@ -81,22 +86,31 @@ namespace BookstoreAPI.Repositories
         public Author GetAuthor(int id)
         {
             OpenConnection();
-            const string query = @"SELECT * FROM library.authors WHERE id = @id";
-            Author author;
+            const string query = @"
+                SELECT author.*, COUNT(book.id) as books_count FROM library.authors author
+                LEFT JOIN library.books book ON author.id = book.author_id
+                WHERE author.id = @id
+                GROUP BY author.id";
+
+            Author author = null;
 
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
             {
                 cmd.Parameters.AddWithValue("id", id);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    reader.Read();
-                    author = new Author
+                    if (reader.HasRows)
                     {
-                        Id = Convert.ToInt32(reader["id"]),
-                        FirstName = Convert.ToString(reader["first_name"]),
-                        LastName = Convert.ToString(reader["last_name"]),
-                        Country = Convert.ToString(reader["country"]),
-                    };
+                        reader.Read();
+                        author = new Author
+                        {
+                            Id = Convert.ToInt32(reader["id"]),
+                            FirstName = Convert.ToString(reader["first_name"]),
+                            LastName = Convert.ToString(reader["last_name"]),
+                            Country = Convert.ToString(reader["country"]),
+                            NumberOfBooks = Convert.ToInt32(reader["books_count"]),
+                        };
+                    }
                 }
             }
 

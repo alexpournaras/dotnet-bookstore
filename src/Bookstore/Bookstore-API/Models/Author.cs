@@ -19,6 +19,8 @@ namespace BookstoreAPI.Models
         [Required(ErrorMessage = "The country field is required.")]
         [JsonPropertyName("country")]
         public string Country { get; set; }
+
+        public int? NumberOfBooks { get; set; }
     }
 
     public class UpdateAuthorEntity

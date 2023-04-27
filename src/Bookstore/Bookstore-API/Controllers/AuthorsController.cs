@@ -38,6 +38,11 @@ namespace BookstoreAPI.Controllers
             try
             {
                 var author = _authorService.Get(id);
+                if (author == null)
+                {
+                    return NotFound(new { message = "Author not found!" });
+                }
+
                 return Ok(author);
             }
             catch (Exception ex)
@@ -68,6 +73,11 @@ namespace BookstoreAPI.Controllers
             try
             {
                 var res = _authorService.Update(author);
+                if (res == 0)
+                {
+                    return NotFound(new { message = "Author not found!" });
+                }
+
                 return Ok("{ rows_affected: " + res + " }");
             }
             catch (Exception ex)
@@ -83,6 +93,11 @@ namespace BookstoreAPI.Controllers
             try
             {
                 var res = _authorService.Delete(id);
+                if (res == 0)
+                {
+                    return NotFound(new { message = "Author not found!" });
+                }
+
                 return Ok("{ rows_affected: " + res + " }");
             }
             catch (Exception ex)
