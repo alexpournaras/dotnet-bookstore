@@ -1,4 +1,4 @@
-CREATE DATABASE "library"
+CREATE DATABASE "bookstore"
     WITH
     OWNER = "postgres"
     TEMPLATE = template0
@@ -8,4 +8,4 @@ CREATE DATABASE "library"
     TABLESPACE = 'pg_default'
     CONNECTION LIMIT = -1;
 
-ALTER DATABASE "library" SET timezone TO 'UTC';
+ALTER DATABASE "bookstore" SET timezone TO 'UTC';

@@ -54,8 +54,8 @@ namespace BookstoreAPI.Repositories
 
             List<Author> authors = new List<Author>();
             const string query = @"
-                SELECT author.*, COUNT(book.id) as books_count FROM library.authors author
-                LEFT JOIN library.books book ON author.id = book.author_id
+                SELECT author.*, COUNT(book.id) as books_count FROM bookstore.authors author
+                LEFT JOIN bookstore.books book ON author.id = book.author_id
                 GROUP BY author.id
                 ORDER BY author.id";
 
@@ -87,8 +87,8 @@ namespace BookstoreAPI.Repositories
         {
             OpenConnection();
             const string query = @"
-                SELECT author.*, COUNT(book.id) as books_count FROM library.authors author
-                LEFT JOIN library.books book ON author.id = book.author_id
+                SELECT author.*, COUNT(book.id) as books_count FROM bookstore.authors author
+                LEFT JOIN bookstore.books book ON author.id = book.author_id
                 WHERE author.id = @id
                 GROUP BY author.id";
 
@@ -123,7 +123,7 @@ namespace BookstoreAPI.Repositories
             OpenConnection();
 
             const string query = @"
-                INSERT INTO library.authors(first_name, last_name, country) 
+                INSERT INTO bookstore.authors(first_name, last_name, country) 
                 VALUES (@first_name, @last_name, @country) RETURNING id";
 
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
@@ -142,7 +142,7 @@ namespace BookstoreAPI.Repositories
         {
             OpenConnection();
 
-            StringBuilder query = new StringBuilder("UPDATE library.authors SET ");
+            StringBuilder query = new StringBuilder("UPDATE bookstore.authors SET ");
 
             List<NpgsqlParameter> paramList = new List<NpgsqlParameter>();
 
@@ -182,7 +182,7 @@ namespace BookstoreAPI.Repositories
         public int DeleteAuthor(int id)
         {
             OpenConnection();
-            const string query = "DELETE FROM library.authors WHERE id = @id";
+            const string query = "DELETE FROM bookstore.authors WHERE id = @id";
             int res;
 
             try
