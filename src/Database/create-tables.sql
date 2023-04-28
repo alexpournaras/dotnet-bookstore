@@ -1,9 +1,9 @@
-\c library;
+\c bookstore;
 
-CREATE SCHEMA library AUTHORIZATION postgres;
+CREATE SCHEMA bookstore AUTHORIZATION postgres;
 
 -- Authors table migration
-CREATE TABLE library.authors 
+CREATE TABLE bookstore.authors 
 (
     id SERIAL PRIMARY KEY,
     first_name character varying COLLATE pg_catalog."default" NOT NULL,
@@ -15,12 +15,12 @@ WITH (
 )
 TABLESPACE pg_default;
 
-ALTER TABLE library.authors 
+ALTER TABLE bookstore.authors 
     OWNER to postgres;
 
 
 -- Books table migration
-CREATE TABLE library.books 
+CREATE TABLE bookstore.books 
 (
     id SERIAL PRIMARY KEY,
     date date NOT NULL,
@@ -28,12 +28,12 @@ CREATE TABLE library.books
     title character varying COLLATE pg_catalog."default" NOT NULL,
     category character varying COLLATE pg_catalog."default" NOT NULL,
     pages int NOT NULL,
-    CONSTRAINT fk_author_id FOREIGN KEY (author_id) REFERENCES library.authors (id)
+    CONSTRAINT fk_author_id FOREIGN KEY (author_id) REFERENCES bookstore.authors (id)
 )
 WITH (
     OIDS = FALSE
 )
 TABLESPACE pg_default;
 
-ALTER TABLE library.books 
+ALTER TABLE bookstore.books 
     OWNER to postgres;

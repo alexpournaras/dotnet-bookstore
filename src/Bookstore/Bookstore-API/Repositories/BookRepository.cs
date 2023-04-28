@@ -59,7 +59,7 @@ namespace BookstoreAPI.Repositories
             OpenConnection();
 
             List<Book> books = new List<Book>();
-            const string query = "SELECT * FROM library.books";
+            const string query = "SELECT * FROM bookstore.books";
 
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
             {
@@ -89,7 +89,7 @@ namespace BookstoreAPI.Repositories
         public Book GetBook(int id)
         {
             OpenConnection();
-            const string query = "SELECT * FROM library.books WHERE id = @id";
+            const string query = "SELECT * FROM bookstore.books WHERE id = @id";
             Book book = null;
 
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
@@ -118,7 +118,7 @@ namespace BookstoreAPI.Repositories
         {
             OpenConnection();
             const string query = @"
-                INSERT INTO library.books(title, date, category, pages, author_id)
+                INSERT INTO bookstore.books(title, date, category, pages, author_id)
                 VALUES (@title, @date, @category, @pages, @author_id) RETURNING id";
 
             try
@@ -148,7 +148,7 @@ namespace BookstoreAPI.Repositories
         {
             OpenConnection();
 
-            StringBuilder query = new StringBuilder("UPDATE library.books SET ");
+            StringBuilder query = new StringBuilder("UPDATE bookstore.books SET ");
 
             List<NpgsqlParameter> paramList = new List<NpgsqlParameter>();
 
@@ -209,7 +209,7 @@ namespace BookstoreAPI.Repositories
             int res = 0;
 
             const string query = @"
-                INSERT INTO library.books(id, title, date, category, pages, author_id)
+                INSERT INTO bookstore.books(id, title, date, category, pages, author_id)
                 VALUES (@id, @title, @date, @category, @pages, @author_id)
                 ON CONFLICT (id) DO UPDATE SET
                     title = @title,
@@ -244,7 +244,7 @@ namespace BookstoreAPI.Repositories
         public int DeleteBook(int id)
         {
             OpenConnection();
-            const string query = "DELETE FROM library.books WHERE id = @id";
+            const string query = "DELETE FROM bookstore.books WHERE id = @id";
 
             int res;
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
@@ -262,13 +262,13 @@ namespace BookstoreAPI.Repositories
             OpenConnection();
             List<Book> books = new List<Book>();
 
-            string query = "SELECT * FROM library.books INNER JOIN library.authors ON library.books.author_id = library.authors.id "
-                + "WHERE library.books.title LIKE '%" + searchTerm + "%' "
-                + "OR library.books.category LIKE '%" + searchTerm + "%' "
-                + "OR library.authors.first_name LIKE '%" + searchTerm + "%' "
-                + "OR library.authors.last_name LIKE '%" + searchTerm + "%' "
-                + "OR library.authors.country LIKE '%" + searchTerm + "%' "
-                + "ORDER BY library.books.id";
+            string query = "SELECT * FROM bookstore.books INNER JOIN bookstore.authors ON bookstore.books.author_id = bookstore.authors.id "
+                + "WHERE bookstore.books.title LIKE '%" + searchTerm + "%' "
+                + "OR bookstore.books.category LIKE '%" + searchTerm + "%' "
+                + "OR bookstore.authors.first_name LIKE '%" + searchTerm + "%' "
+                + "OR bookstore.authors.last_name LIKE '%" + searchTerm + "%' "
+                + "OR bookstore.authors.country LIKE '%" + searchTerm + "%' "
+                + "ORDER BY bookstore.books.id";
 
             using (var cmd = new NpgsqlCommand(query, GetConnection()))
             {

@@ -62,7 +62,7 @@ namespace BookstoreAPI
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Library API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bookstore API", Version = "v1" });
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
