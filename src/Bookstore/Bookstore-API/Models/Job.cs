@@ -9,6 +9,6 @@ namespace BookstoreAPI.Models
 
         public string Status { get; set; }
 
-        public List<Book> Books { get; set; }
+        public List<UpdateBookEntity> Books { get; set; }
     }
 }

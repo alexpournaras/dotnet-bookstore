@@ -35,7 +35,7 @@ namespace BookstoreAPI.Repositories
         /// </summary>
         /// <param name="book"></param>
         /// <returns>The number of rows affected</returns>
-        // public int UpsertBook(UpdateBookEntity book);
+        public int UpsertBook(UpdateBookEntity book);
         /// <summary>
         /// Delete a <see cref="Book"/> from the database
         /// </summary>
@@ -118,7 +118,7 @@ namespace BookstoreAPI.Repositories
         {
             OpenConnection();
             const string query = @"
-                INSERT INTO library.books(title, date, category, pages, author_id) 
+                INSERT INTO library.books(title, date, category, pages, author_id)
                 VALUES (@title, @date, @category, @pages, @author_id) RETURNING id";
 
             try
@@ -203,36 +203,35 @@ namespace BookstoreAPI.Repositories
             return res;
         }
 
-//         public int UpsertBook(UpdateBookEntity book)
-//         {
-//             OpenConnection();
+        public int UpsertBook(UpdateBookEntity book)
+        {
+            OpenConnection();
 
-//             const string query = @"
-// INSERT INTO bookstore.book(id, title, publication_date, category, num_pages, author_id, update_at) 
-// VALUES (@id, @title, @publication_date, @category, @num_pages, @author_id, @updated_at)
-// ON CONFLICT (id) DO UPDATE SET 
-//     title = @title,
-//     publication_date = @publication_date,
-//     category = @category,
-//     num_pages = @num_pages,
-//     author_id = @author_id,
-//     updated_at = @updated_at";
-//             int res;
-//             using (var cmd = new NpgsqlCommand(query, GetConnection()))
-//             {
-//                 cmd.Parameters.AddWithValue("id", book.Id);
-//                 cmd.Parameters.AddWithValue("title", book.Title ?? default);
-//                 cmd.Parameters.AddWithValue("publication_date", book.PublicationDate ?? default);
-//                 cmd.Parameters.AddWithValue("category", book.Category ?? default);
-//                 cmd.Parameters.AddWithValue("num_pages", book.NumPages ?? default);
-//                 cmd.Parameters.AddWithValue("author_id", book.AuthorId ?? default);
-//                 cmd.Parameters.AddWithValue("updated_at", DateTime.UtcNow);
-//                 res = cmd.ExecuteNonQuery();
-//             }
+            const string query = @"
+                INSERT INTO library.books(id, title, date, category, pages, author_id)
+                VALUES (@id, @title, @date, @category, @pages, @author_id)
+                ON CONFLICT (id) DO UPDATE SET
+                    title = @title,
+                    date = @date,
+                    category = @category,
+                    pages = @pages,
+                    author_id = @author_id";
 
-//             CloseConnection();
-//             return res;
-//         }
+            int res;
+            using (var cmd = new NpgsqlCommand(query, GetConnection()))
+            {
+                cmd.Parameters.AddWithValue("id", book.Id);
+                cmd.Parameters.AddWithValue("title", book.Title ?? default);
+                cmd.Parameters.AddWithValue("data", book.Date ?? default);
+                cmd.Parameters.AddWithValue("category", book.Category ?? default);
+                cmd.Parameters.AddWithValue("pages", book.Pages ?? default);
+                cmd.Parameters.AddWithValue("author_id", book.AuthorId ?? default);
+                res = cmd.ExecuteNonQuery();
+            }
+
+            CloseConnection();
+            return res;
+        }
 
         public int DeleteBook(int id)
         {

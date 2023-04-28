@@ -61,7 +61,7 @@ namespace BookstoreAPI
             services.AddSingleton(new RedisCacheManager(Configuration.GetConnectionString("Redis")));
             //services.AddScoped<LibraryDatalayer>();
             //services.AddScoped<ILibraryService, LibraryService>();
-            //services.AddSingleton<IWorkerService, WorkerService>();
+            services.AddSingleton<IWorkerService, WorkerService>();
 
             services.AddSwaggerGen(c =>
             {

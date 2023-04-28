@@ -1,39 +1,38 @@
-﻿//using BookstoreAPI.Models;
-//using BookstoreAPI.Helpers;
+﻿using BookstoreAPI.Models;
+using BookstoreAPI.Helpers;
+using BookstoreAPI.Repositories;
 
-//namespace BookstoreAPI.Services
-//{
-//    public interface IWorkerService
-//    {
-//        Job AddBooksInQueue(List<Book> books);
-//        Job FindJobById(Guid id);
-//    }
+namespace BookstoreAPI.Services
+{
+   public interface IWorkerService
+   {
+       Job AddBooksInQueue(List<UpdateBookEntity> books);
+       Job FindJobById(Guid id);
+   }
 
-//    public class WorkerService : IWorkerService
-//    {
-//        // The queue that contains the jobs
-//        ParsingQueue _queue = new ParsingQueue();
+   public class WorkerService : IWorkerService
+   {
+       ParsingQueue _queue = new ParsingQueue();
 
-//        public Job AddBooksInQueue(List<Book> books)
-//        {
-//            // Create a new job
-//            Job job = new()
-//            {
-//                Id = Guid.NewGuid(),
-//                Status = "Queued",
-//                Books = books
-//            };
+       public Job AddBooksInQueue(List<UpdateBookEntity> books)
+       {
+           // Create a new job
+           Job job = new()
+           {
+               Id = Guid.NewGuid(),
+               Status = "Queued",
+               Books = books
+           };
 
-//            // Add job in queue
-//            _queue.AddJobInQueue(job);
+           // Add job in queue
+           _queue.AddJobInQueue(job);
 
-//            return job;
-//        }
+           return job;
+       }
 
-//        public Job FindJobById(Guid id)
-//        {
-//            // Find job to show status
-//            return _queue.FindJobById(id);
-//        }
-//    }
-//}
+       public Job FindJobById(Guid id)
+       {
+           return _queue.FindJobById(id);
+       }
+   }
+}
