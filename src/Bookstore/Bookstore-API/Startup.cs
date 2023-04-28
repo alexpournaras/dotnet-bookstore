@@ -1,4 +1,3 @@
-using BookstoreAPI.Caching;
 using BookstoreAPI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using BookstoreAPI.Repositories;
@@ -57,8 +56,8 @@ namespace BookstoreAPI
             services.AddScoped<IAuthorRepository, AuthorRepository>();
 
             services.AddSingleton<DatabaseHelper>();
+            services.AddSingleton<RedisCacheManager>();
             services.AddSingleton<IWorkerService, WorkerService>();
-            services.AddSingleton(new RedisCacheManager(Configuration.GetConnectionString("Redis")));
 
             services.AddSwaggerGen(c =>
             {

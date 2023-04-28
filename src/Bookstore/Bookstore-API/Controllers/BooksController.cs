@@ -53,6 +53,7 @@ namespace BookstoreAPI.Controllers
             }
         }
 
+        [IPLocationLookup]
         [HttpPost]
         public ActionResult<Book> CreateBook(Book book)
         {
@@ -97,6 +98,7 @@ namespace BookstoreAPI.Controllers
             }
         }
 
+        [IPLocationLookup]
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {

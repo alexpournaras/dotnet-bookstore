@@ -1,16 +1,16 @@
 using StackExchange.Redis;
 using System.Text.Json;
 
-namespace BookstoreAPI.Caching
+namespace BookstoreAPI.Helpers
 {
     public class RedisCacheManager
     {
         private readonly ConnectionMultiplexer _redis;
         private readonly IDatabase _database;
 
-        public RedisCacheManager(string connectionString)
+        public RedisCacheManager(IConfiguration configuration)
         {
-            _redis = ConnectionMultiplexer.Connect(connectionString);
+            _redis = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
             _database = _redis.GetDatabase();
         }
 

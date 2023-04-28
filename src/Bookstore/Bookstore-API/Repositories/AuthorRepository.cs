@@ -172,7 +172,6 @@ namespace BookstoreAPI.Repositories
             {
                 cmd.Parameters.AddRange(paramList.ToArray());
                 res = cmd.ExecuteNonQuery();
-
             }
 
             CloseConnection();

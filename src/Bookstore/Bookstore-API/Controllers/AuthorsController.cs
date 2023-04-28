@@ -52,6 +52,7 @@ namespace BookstoreAPI.Controllers
             }
         }
 
+        [IPLocationLookup]
         [HttpPost]
         public ActionResult<Author> CreateAuthor(Author author)
         {
@@ -87,6 +88,7 @@ namespace BookstoreAPI.Controllers
             }
         }
 
+        [IPLocationLookup]
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
