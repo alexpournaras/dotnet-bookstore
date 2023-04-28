@@ -12,27 +12,34 @@ namespace BookstoreAPI.Services
 
    public class WorkerService : IWorkerService
    {
-       ParsingQueue _queue = new ParsingQueue();
+        private ParsingQueue _queue;
+        private DatabaseHelper _databaseHelper;
 
-       public Job AddBooksInQueue(List<UpdateBookEntity> books)
-       {
-           // Create a new job
-           Job job = new()
-           {
-               Id = Guid.NewGuid(),
-               Status = "Queued",
-               Books = books
-           };
+        public WorkerService(DatabaseHelper databaseHelper)
+        {
+            _databaseHelper = databaseHelper;
+            _queue = new ParsingQueue(_databaseHelper);
+        }
+        public Job AddBooksInQueue(List<UpdateBookEntity> books)
+        {
+            // Create a new job
+            Job job = new()
+            {
+                Id = Guid.NewGuid(),
+                Status = "Queued",
+                Books = books
+            };
 
-           // Add job in queue
-           _queue.AddJobInQueue(job);
+            // Add job in queue
+            _queue.AddJobInQueue(job);
 
-           return job;
-       }
+            return job;
+        }
 
        public Job FindJobById(Guid id)
        {
-           return _queue.FindJobById(id);
+            return _queue.FindJobById(id);
+            // return null;
        }
    }
 }

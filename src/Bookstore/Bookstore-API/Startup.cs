@@ -1,6 +1,5 @@
 using BookstoreAPI.Caching;
 using BookstoreAPI.Services;
-//using BookstoreAPI.Datalayer;
 using Microsoft.Extensions.DependencyInjection;
 using BookstoreAPI.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -52,16 +51,14 @@ namespace BookstoreAPI
 
             services.AddControllers();
 
-            services.AddScoped<DatabaseHelper>();
             services.AddScoped<IBookService, BookService>();
             services.AddScoped<IBookRepository, BookRepository>();
             services.AddScoped<IAuthorService, AuthorService>();
             services.AddScoped<IAuthorRepository, AuthorRepository>();
 
-            services.AddSingleton(new RedisCacheManager(Configuration.GetConnectionString("Redis")));
-            //services.AddScoped<LibraryDatalayer>();
-            //services.AddScoped<ILibraryService, LibraryService>();
+            services.AddSingleton<DatabaseHelper>();
             services.AddSingleton<IWorkerService, WorkerService>();
+            services.AddSingleton(new RedisCacheManager(Configuration.GetConnectionString("Redis")));
 
             services.AddSwaggerGen(c =>
             {

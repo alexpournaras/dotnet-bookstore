@@ -206,6 +206,7 @@ namespace BookstoreAPI.Repositories
         public int UpsertBook(UpdateBookEntity book)
         {
             OpenConnection();
+            int res = 0;
 
             const string query = @"
                 INSERT INTO library.books(id, title, date, category, pages, author_id)
@@ -217,16 +218,23 @@ namespace BookstoreAPI.Repositories
                     pages = @pages,
                     author_id = @author_id";
 
-            int res;
-            using (var cmd = new NpgsqlCommand(query, GetConnection()))
+            try
             {
-                cmd.Parameters.AddWithValue("id", book.Id);
-                cmd.Parameters.AddWithValue("title", book.Title ?? default);
-                cmd.Parameters.AddWithValue("data", book.Date ?? default);
-                cmd.Parameters.AddWithValue("category", book.Category ?? default);
-                cmd.Parameters.AddWithValue("pages", book.Pages ?? default);
-                cmd.Parameters.AddWithValue("author_id", book.AuthorId ?? default);
-                res = cmd.ExecuteNonQuery();
+                using (var cmd = new NpgsqlCommand(query, GetConnection()))
+                {
+                    cmd.Parameters.AddWithValue("id", book.Id);
+                    cmd.Parameters.AddWithValue("title", book.Title ?? default);
+                    cmd.Parameters.AddWithValue("date", book.Date ?? default);
+                    cmd.Parameters.AddWithValue("category", book.Category ?? default);
+                    cmd.Parameters.AddWithValue("pages", book.Pages ?? default);
+                    cmd.Parameters.AddWithValue("author_id", book.AuthorId ?? default);
+                    res = cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                CloseConnection();
             }
 
             CloseConnection();
