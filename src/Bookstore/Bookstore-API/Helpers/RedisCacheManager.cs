@@ -10,8 +10,10 @@ namespace BookstoreAPI.Helpers
 
         public RedisCacheManager(IConfiguration configuration)
         {
-            _redis = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
-            _database = _redis.GetDatabase();
+            var options = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis"));
+            
+            _redis = ConnectionMultiplexer.Connect(options);
+            _database = _redis.GetDatabase(options.DefaultDatabase.GetValueOrDefault());
         }
 
         public ConnectionMultiplexer Connection => _redis;
