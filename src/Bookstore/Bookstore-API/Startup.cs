@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using AspNetCoreRateLimit;
 using BookstoreAPI.Helpers;
+using System.Net;
+using System.Text.Json;
 
 namespace BookstoreAPI
 {
@@ -46,6 +48,18 @@ namespace BookstoreAPI
                 opt.SaveToken = true;
                 opt.ClaimsIssuer = tokenValidationParameters.ValidIssuer;
                 opt.TokenValidationParameters = tokenValidationParameters;
+
+                opt.Events = new JwtBearerEvents
+                {
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+
+                        await context.Response.WriteAsync(JsonSerializer.Serialize(new { message = "Unauthorized" } ));
+                    }
+                };
             });
 
             services.AddControllers();

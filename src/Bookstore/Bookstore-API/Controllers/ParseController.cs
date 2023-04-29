@@ -17,9 +17,9 @@ namespace BookstoreAPI.Controllers
            _workerService = workerService;
        }
 
-       [IPLocationLookup]
        [HttpPost("books")]
-    //    [Authorize(Roles = "Developer")]
+       [IPLocationLookup]
+       [Authorize(Roles = "Developer")]
        public ActionResult Parse(List<UpdateBookEntity> books)
        {
             try

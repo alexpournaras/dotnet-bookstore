@@ -18,6 +18,7 @@ namespace BookstoreAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Developer,User")]
         public ActionResult<List<Author>> GetAllAuthors()
         {
             try
@@ -52,8 +53,9 @@ namespace BookstoreAPI.Controllers
             }
         }
 
-        [IPLocationLookup]
         [HttpPost]
+        [IPLocationLookup]
+        [Authorize(Roles = "Developer")]
         public ActionResult<Author> CreateAuthor(Author author)
         {
             try
@@ -69,6 +71,7 @@ namespace BookstoreAPI.Controllers
         }
 
         [HttpPatch]
+        [Authorize(Roles = "Developer")]
         public ActionResult<Author> UpdateAuthor(UpdateAuthorEntity author)
         {
             try
@@ -88,8 +91,9 @@ namespace BookstoreAPI.Controllers
             }
         }
 
-        [IPLocationLookup]
         [HttpDelete("{id}")]
+        [IPLocationLookup]
+        [Authorize(Roles = "Developer")]
         public ActionResult Delete(int id)
         {
             try
