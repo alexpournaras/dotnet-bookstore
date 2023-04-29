@@ -4,7 +4,7 @@ using StackExchange.Redis;
 
 public class TestFixture : IDisposable
 {
-    private IConfiguration _configuration;
+    public IConfiguration _configuration;
     private string _redisTestConnectionString;
     private string _postgresTestConnectionString;
     private string _postgresDevelopmentConnectionString;

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using System.Net.Http.Formatting;
 
 namespace BookstoreTests
 {
@@ -25,24 +26,26 @@ namespace BookstoreTests
         public AuthorControllerTests(TestFixture fixture)
         {
             _fixture = fixture;
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
-            
+            _configuration = fixture._configuration;
+    
             var testServer = new TestServer(WebHost.CreateDefaultBuilder()
                 .UseEnvironment("Test")
-                .UseConfiguration(_configuration)
+                .UseConfiguration(_fixture._configuration)
                 .UseStartup<Startup>());
 
             _client = testServer.CreateClient();
         }
 
         [Fact]
-        public async Task CreateAuthorTest()
+        public async Task GetAllAuthors()
         {
-            Console.Write("test");
+            var response = await _client.GetAsync("/api/authors");
+            
+            Assert.True(response.IsSuccessStatusCode);
+            
+            var authors = await response.Content.ReadAsAsync<List<Author>>();
+            Assert.NotEmpty(authors);
+            Assert.Equal(3, authors.Count());
         }
     }
 }
