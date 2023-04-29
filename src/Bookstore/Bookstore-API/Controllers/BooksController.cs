@@ -17,8 +17,8 @@ namespace BookstoreAPI.Controllers
             _bookService = bookService;
         }
 
-        // [Authorize(Roles = "Developer,User")]
         [HttpGet]
+        [Authorize(Roles = "Developer,User")]
         public ActionResult<List<Book>> GetAllBooks()
         {
             try
@@ -53,8 +53,9 @@ namespace BookstoreAPI.Controllers
             }
         }
 
-        [IPLocationLookup]
         [HttpPost]
+        [IPLocationLookup]
+        [Authorize(Roles = "Developer")]
         public ActionResult<Book> CreateBook(Book book)
         {
             try
@@ -75,6 +76,7 @@ namespace BookstoreAPI.Controllers
         }
 
         [HttpPatch]
+        [Authorize(Roles = "Developer")]
         public ActionResult<Book> UpdateBook(UpdateBookEntity book)
         {
             try
@@ -98,8 +100,9 @@ namespace BookstoreAPI.Controllers
             }
         }
 
-        [IPLocationLookup]
         [HttpDelete("{id}")]
+        [IPLocationLookup]
+        [Authorize(Roles = "Developer")]
         public ActionResult Delete(int id)
         {
             try
@@ -120,7 +123,7 @@ namespace BookstoreAPI.Controllers
         }
 
         [HttpGet("search")]
-        // [Authorize(Roles = "Developer,User")]
+        [Authorize(Roles = "Developer,User")]
         public ActionResult<List<Book>> SearchBooks(string searchTerm)
         {
             try
