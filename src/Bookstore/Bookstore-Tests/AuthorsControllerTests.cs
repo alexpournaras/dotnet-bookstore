@@ -39,6 +39,9 @@ namespace BookstoreTests
         [Fact]
         public async Task GetAllAuthors()
         {
+            string _jwtToken = JwtTokenGenerator.GenerateToken(_configuration, "Developer");
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _jwtToken);
+
             var response = await _client.GetAsync("/api/authors");
             
             Assert.True(response.IsSuccessStatusCode);

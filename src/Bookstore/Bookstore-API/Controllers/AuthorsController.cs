@@ -18,7 +18,7 @@ namespace BookstoreAPI.Controllers
         }
 
         [HttpGet]
-        // [Authorize(Roles = "Developer,User")]
+        [Authorize(Roles = "Developer,User")]
         public ActionResult<List<Author>> GetAllAuthors()
         {
             try
