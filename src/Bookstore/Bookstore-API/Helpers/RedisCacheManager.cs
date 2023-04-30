@@ -8,10 +8,16 @@ namespace BookstoreAPI.Helpers
         private readonly ConnectionMultiplexer _redis;
         private readonly IDatabase _database;
 
-        public RedisCacheManager(IConfiguration configuration)
+        public RedisCacheManager(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            _redis = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
-            _database = _redis.GetDatabase();
+            var options = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis"));
+            
+            if (environment.EnvironmentName == "Test") {
+                options = ConfigurationOptions.Parse(configuration.GetConnectionString("TestRedis"));
+            }
+
+            _redis = ConnectionMultiplexer.Connect(options);
+            _database = _redis.GetDatabase(options.DefaultDatabase.GetValueOrDefault());
         }
 
         public ConnectionMultiplexer Connection => _redis;

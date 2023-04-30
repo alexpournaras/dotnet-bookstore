@@ -97,16 +97,19 @@ namespace BookstoreAPI.Repositories
                 cmd.Parameters.AddWithValue("id", id);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    reader.Read();
-                    book = new Book
+                    if (reader.HasRows)
                     {
-                        Id = Convert.ToInt32(reader["id"]),
-                        Date = Convert.ToDateTime(reader["date"]),
-                        Title = Convert.ToString(reader["title"]),
-                        Category = Convert.ToString(reader["category"]),
-                        Pages = Convert.ToInt32(reader["pages"]),
-                        AuthorId = Convert.ToInt32(reader["author_id"]),
-                    };
+                        reader.Read();
+                        book = new Book
+                        {
+                            Id = Convert.ToInt32(reader["id"]),
+                            Date = Convert.ToDateTime(reader["date"]),
+                            Title = Convert.ToString(reader["title"]),
+                            Category = Convert.ToString(reader["category"]),
+                            Pages = Convert.ToInt32(reader["pages"]),
+                            AuthorId = Convert.ToInt32(reader["author_id"]),
+                        };
+                    }
                 }
             }
 

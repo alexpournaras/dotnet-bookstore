@@ -16,25 +16,35 @@ namespace BookstoreAPI.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
+            string remoteIpAddress = "";
+            string ipLookupEnabled = _configuration["ipLookupEnabled"];
             string customLookupIP = _configuration["CustomLookupIP"];
             string allowedCountry = _configuration["AllowedCountry"];
 
-            // Get remote IP address or a custom IP address based on the environment
-            string remoteIpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString();
-            if (customLookupIP != null) remoteIpAddress = customLookupIP;
+            if (ipLookupEnabled == "true") {
+                if (customLookupIP == null)
+                {
+                    // Get remote IP address or a custom IP address based on the environment
+                    remoteIpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString();
+                }
+                else
+                {
+                    remoteIpAddress = customLookupIP;
+                }
 
-            // Get country code of the IP address from IPAPI
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://ipapi.co/" + remoteIpAddress + "/country/");
-            request.UserAgent="ipapi.co/#c-sharp-v1.03";
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            var reader = new System.IO.StreamReader(response.GetResponseStream(), UTF8Encoding.UTF8);
+                // Get country code of the IP address from IPAPI
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://ipapi.co/" + remoteIpAddress + "/country/");
+                request.UserAgent="ipapi.co/#c-sharp-v1.03";
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                var reader = new System.IO.StreamReader(response.GetResponseStream(), UTF8Encoding.UTF8);
 
-            // Block requests from unauthorized countries
-            if (reader.ReadToEnd() != allowedCountry)
-            {
-                context.Result = new UnauthorizedResult();
-                return;
+                // Block requests from unauthorized countries
+                if (reader.ReadToEnd() != allowedCountry)
+                {
+                    context.Result = new UnauthorizedResult();
+                    return;
+                }
             }
         }
 
